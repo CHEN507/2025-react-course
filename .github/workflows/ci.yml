@@ -1,0 +1,82 @@
+name: CI
+
+# 執行時機：在 push 到 main 或有新 PR 產生/更新時自動執行
+on:
+  pull_request:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+# 這份 workflow 需要的權限
+permissions:
+  contents: read # 讓 actions 可以讀取我的 Repository
+  pull-requests: write # 使機器人有權限在 PR 下方留言與更新報告
+
+jobs:
+  verify: # 檢查 Prettier 和 ESLint 有無錯誤
+    name: Code Quality # 會顯示在 GitHub Actions 面板上的名字
+    runs-on: ubuntu-latest # 選擇 actions 的虛擬機類型
+    steps:
+      # 將我的 Repository 複製一份給 actions
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      # 請 actions 安裝好指定版本的 node.js，並開啟 npm 快取
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc' # 跟隨專案的 node 版本設定
+          cache: 'npm' # actions/setup-node@v6 中預設 npm 的 cache 是打開的，如果 package-lock.json 沒有改變，會快取 ~/.npm，提高安裝速度
+
+      # 請 actions 在它的終端機跑 npm ci，按照 lock file 安裝所有依賴項
+      - name: Install Dependencies
+        run: npm ci
+
+      # 請 actions 在它的終端機跑 npm run format:check 確認沒有格式錯誤
+      - name: Format Check
+        run: npm run format:check
+
+      # 請 actions 在它的終端機跑 npm run lint 確認沒有 lint 錯誤
+      - name: Lint
+        run: npm run lint
+
+  build: # 檢查專案是否能夠成功打包
+    name: Verify Production Build
+    runs-on: ubuntu-latest
+    needs: verify # 只有在 verify 成功後才會執行
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc' # 跟隨專案的 node 版本設定
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  report: # 將 CI 結果 comment 到 PR
+    name: Final CI Report
+    runs-on: ubuntu-latest
+    needs: # 只有在 verify 和 build 結束後才會執行
+      - verify
+      - build
+    # 確保不論 verify 和 build 成功或失敗都會執行，且僅在 Pull Request 情境下執行留言
+    if: always() && github.event_name == 'pull_request'
+    steps:
+      - name: Sticky PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ci-summary-report # 設定唯一識別標籤，確保多次檢查時僅更新同一則留言，避免洗版
+          message: |
+            ### CI 檢核報告
+            - **程式碼品質 (Lint/Format)**: ${{ needs.verify.result == 'success' && '✅ 通過' || '❌ 失敗' }}
+            - **生產環境打包 (Build)**: ${{ needs.build.result == 'success' && '✅ 通過' || '❌ 失敗' }}
+
+            ---
+            *最後更新時間：${{ github.event.pull_request.updated_at }}*

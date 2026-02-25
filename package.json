@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "format": "npx prettier . --write"
+    "format": "npx prettier . --write",
+    "format:check": "prettier . --check"
   },
   "dependencies": {
     "react": "^19.2.0",
