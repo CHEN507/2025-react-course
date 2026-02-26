@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    // --- 基礎環境語法 ---
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+
+    // --- 程式碼檢查機制 ---
+    "checkJs": false, // 暫時關閉程式碼檢查，以避免過多類型報錯
+    "strict": true, // 預設採取嚴格檢查標準
+
+    // --- 路徑與別名設定 ---
+    "baseUrl": "./",
+    "paths": {
+      // 對應 Vite 中的路徑別名設定
+      "@/*": ["./src/*"],
+      "assets": ["./src/assets"]
+    }
+  },
+  // 效能優化
+  "exclude": ["node_modules", "dist"] // 排除主動掃描不需被索引的第三方套件與打包產物
+}
