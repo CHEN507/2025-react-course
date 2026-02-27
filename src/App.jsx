@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import Week2 from './pages/week2/Week2.jsx';
+import Week3 from './pages/week3/Week3.jsx';
 
 function App() {
   const [page, setPage] = useState(0);
@@ -9,6 +10,8 @@ function App() {
     switch (page) {
       case 2:
         return <Week2 />;
+      case 3:
+        return <Week3 />;
 
       default:
         return (
@@ -17,6 +20,9 @@ function App() {
             <div className="d-flex flex-column gap-3 align-items-center">
               <button type="button" className="btn btn-primary" onClick={() => setPage(2)}>
                 第二週 - RESTful API 串接
+              </button>
+              <button type="button" className="btn btn-primary" onClick={() => setPage(3)}>
+                第三週 - 熟練 React.js
               </button>
             </div>
           </div>
