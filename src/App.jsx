@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import Week2 from './pages/week2/Week2.jsx';
 import Week3 from './pages/week3/Week3.jsx';
+import Week4 from './pages/week4/Week4.jsx';
 
 function App() {
   const [page, setPage] = useState(0);
@@ -12,6 +13,8 @@ function App() {
         return <Week2 />;
       case 3:
         return <Week3 />;
+      case 4:
+        return <Week4 />;
 
       default:
         return (
@@ -23,6 +26,9 @@ function App() {
               </button>
               <button type="button" className="btn btn-primary" onClick={() => setPage(3)}>
                 第三週 - 熟練 React.js
+              </button>
+              <button type="button" className="btn btn-primary" onClick={() => setPage(4)}>
+                第四週 - 元件化
               </button>
             </div>
           </div>
