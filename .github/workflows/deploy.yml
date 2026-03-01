@@ -35,6 +35,9 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
+          VITE_API_PATH: ${{ secrets.VITE_API_PATH }}
         run: npm run build
 
       # 將 actions 剛剛 build 好的 dist 上傳給 GitHub Pages 使用
